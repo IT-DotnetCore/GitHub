@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TestLibrary.ApplicationDbContext;
+using TestLibrary.Canstanta;
 using TestLibrary.Models;
 
 namespace TestLibrary.Controllers
@@ -20,14 +21,57 @@ namespace TestLibrary.Controllers
         }
 
         // GET: Books
-        public async Task<IActionResult> Index()
+        //public IActionResult Index()
+        //{
+        //    ViewData["Allbook"]= _context.books.Include(b => b.Category);
+        //    return View();
+        //}
+        public async Task<IActionResult> Index(
+                       string sortOrder,
+                       string currentFilter,
+                       string searchString,
+                        int? pageNumber)
         {
-            var libraryDbContext = _context.books.Include(b => b.Category);
-            return View(await libraryDbContext.ToListAsync());
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            //ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
+           
+
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewData["CurrentFilter"] = searchString;
+
+            var book = from s in _context.books.Include(b => b.Category)
+                       select s;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                book = book.Where(s => s.Title.Contains(searchString)
+                                       || s.Author.Contains(searchString) 
+                                       || s.Category.Name.Contains(searchString)
+                                       );
+            }
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    book = book.OrderByDescending(s => s.Author);
+                    break;
+                default:
+                    book = book.OrderBy(s => s.Author);
+                    break;
+            }
+
+            int pageSize = 5;
+            return View(await PaginatedList<Book>.CreateAsync(book.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
-        // GET: Books/Details/5
-        public async Task<IActionResult> Details(int? id)
+            public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
@@ -45,17 +89,13 @@ namespace TestLibrary.Controllers
             return View(book);
         }
 
-        // GET: Books/Create
         public IActionResult Create()
         {
             ViewData["categoryID"] = new SelectList(_context.categories, "id", "Name");
             return View();
         }
 
-        // POST: Books/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("id,Title,Author,Language,categoryID")] Book book)
         {
@@ -122,33 +162,16 @@ namespace TestLibrary.Controllers
             return View(book);
         }
 
-        // GET: Books/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        [HttpPost]
+        public IActionResult Delete(int id)
         {
-            if (id == null)
+            var make = _context.books.Find(id);
+            if (make == null)
             {
                 return NotFound();
             }
-
-            var book = await _context.books
-                .Include(b => b.Category)
-                .FirstOrDefaultAsync(m => m.id == id);
-            if (book == null)
-            {
-                return NotFound();
-            }
-
-            return View(book);
-        }
-
-        // POST: Books/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var book = await _context.books.FindAsync(id);
-            _context.books.Remove(book);
-            await _context.SaveChangesAsync();
+            _context.books.Remove(make);
+            _context.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
 

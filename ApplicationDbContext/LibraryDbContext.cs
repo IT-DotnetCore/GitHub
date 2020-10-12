@@ -18,7 +18,7 @@ namespace TestLibrary.ApplicationDbContext
         }
         public DbSet<Book> books { get; set; }
         public DbSet<Category> categories { get; set; }
-        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+       
 
     }
 }

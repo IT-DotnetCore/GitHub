@@ -121,38 +121,51 @@ namespace TestLibrary.Controllers
             ViewData["categoryID"] = new SelectList(_context.categories, "id", "Name", book.categoryID);
             return View(book);
         }
-
-        // GET: Books/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        [HttpPost]
+        public IActionResult Delete(int id)
         {
-            if (id == null)
+            var make = _context.books.Find(id);
+            if (make == null)
             {
                 return NotFound();
             }
-
-            var book = await _context.books
-                .Include(b => b.Category)
-                .FirstOrDefaultAsync(m => m.id == id);
-            if (book == null)
-            {
-                return NotFound();
-            }
-
-            return View(book);
-        }
-
-        // POST: Books/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var book = await _context.books.FindAsync(id);
-            _context.books.Remove(book);
-            await _context.SaveChangesAsync();
+            _context.books.Remove(make);
+            _context.SaveChanges();
             return RedirectToAction(nameof(Index));
-        }
+            }
 
-        private bool BookExists(int id)
+
+            // GET: Books/Delete/5
+            //public async Task<IActionResult> Delete(int? id)
+            //{
+            //    if (id == null)
+            //    {
+            //        return NotFound();
+            //    }
+
+            //    var book = await _context.books
+            //        .Include(b => b.Category)
+            //        .FirstOrDefaultAsync(m => m.id == id);
+            //    if (book == null)
+            //    {
+            //        return NotFound();
+            //    }
+
+            //    return View(book);
+            //}
+
+            // POST: Books/Delete/5
+            //[HttpPost, ActionName("Delete")]
+            //[ValidateAntiForgeryToken]
+            //public async Task<IActionResult> DeleteConfirmed(int id)
+            //{
+            //    var book = await _context.books.FindAsync(id);
+            //    _context.books.Remove(book);
+            //    await _context.SaveChangesAsync();
+            //    return RedirectToAction(nameof(Index));
+            //}
+
+            private bool BookExists(int id)
         {
             return _context.books.Any(e => e.id == id);
         }

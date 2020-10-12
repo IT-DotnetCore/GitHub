@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TestLibrary.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace TestLibrary
 {
@@ -21,11 +22,15 @@ namespace TestLibrary
         {
             services.AddControllersWithViews();
             services.AddMvc();
-
+            services.AddRazorPages();
             services.AddDbContext<LibraryDbContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
+            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddEntityFrameworkStores<LibraryDbContext>()
+                .AddDefaultUI()
+                .AddDefaultTokenProviders();
 
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -33,6 +38,7 @@ namespace TestLibrary
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+               
             }
             else
             {
@@ -45,12 +51,15 @@ namespace TestLibrary
             app.UseRouting();
 
             app.UseAuthorization();
+            app.UseAuthentication();
+           
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapRazorPages();
             });
         }
     }

@@ -19,8 +19,8 @@
                     <li class="nav-item active">
                         <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
                     </li>
-                    @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Executive))
-                    {
+                   @*@if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Executive))
+                    {*@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Masters
@@ -28,13 +28,13 @@
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" asp-controller="Categories" asp-action="Index">Categories</a>
                                 <a class="dropdown-item" asp-controller="Books" asp-action="Index">Books</a>
-                                @if (User.IsInRole(Roles.Admin))
-                                {
-                                    <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Register">Add User</a>
-                                }
+                                @*@if (User.IsInRole(Roles.Admin))
+                                {*@
+                                    <a class="dropdown-item" id="register" asp-area="Identity" asp-page="/Account/Register">Add User</a>
+                                @*}*@
                             </div>
                         </li>
-                    }
+                    @*}*@
                 </ul>
                 <partial name="_LoginPartial" />
             </div>

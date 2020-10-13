@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ using TestLibrary.Models;
 
 namespace TestLibrary.Controllers
 {
+    [Authorize("Admin,Executive")]
     public class BooksController : Controller
     {
         private readonly LibraryDbContext _context;
@@ -20,12 +22,7 @@ namespace TestLibrary.Controllers
             _context = context;
         }
 
-        // GET: Books
-        //public IActionResult Index()
-        //{
-        //    ViewData["Allbook"]= _context.books.Include(b => b.Category);
-        //    return View();
-        //}
+
         public async Task<IActionResult> Index(
                        string sortOrder,
                        string currentFilter,
@@ -34,8 +31,7 @@ namespace TestLibrary.Controllers
         {
             ViewData["CurrentSort"] = sortOrder;
             ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            //ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
-           
+
 
             if (searchString != null)
             {
@@ -53,7 +49,7 @@ namespace TestLibrary.Controllers
             if (!String.IsNullOrEmpty(searchString))
             {
                 book = book.Where(s => s.Title.Contains(searchString)
-                                       || s.Author.Contains(searchString) 
+                                       || s.Author.Contains(searchString)
                                        || s.Category.Name.Contains(searchString)
                                        );
             }
@@ -71,7 +67,7 @@ namespace TestLibrary.Controllers
             return View(await PaginatedList<Book>.CreateAsync(book.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
-            public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
@@ -95,7 +91,7 @@ namespace TestLibrary.Controllers
             return View();
         }
 
-         [HttpPost]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("id,Title,Author,Language,categoryID")] Book book)
         {
@@ -162,6 +158,11 @@ namespace TestLibrary.Controllers
             return View(book);
         }
 
+        private bool BookExists(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         [HttpPost]
         public IActionResult Delete(int id)
         {
@@ -169,15 +170,16 @@ namespace TestLibrary.Controllers
             if (make == null)
             {
                 return NotFound();
+
             }
             _context.books.Remove(make);
             _context.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool BookExists(int id)
-        {
-            return _context.books.Any(e => e.id == id);
-        }
+        //private bool BookExists(int id)
+        //{
+        //    return _context.books.Any(e => e.id == id);
+        //}
     }
 }

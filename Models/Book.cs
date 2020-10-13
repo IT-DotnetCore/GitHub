@@ -11,15 +11,16 @@ namespace TestLibrary.Models
     {
         [Key]
         public int id { get; set; }
-        [Required]
-        [StringLength(40)]
+        [Required(ErrorMessage ="Please enter the title of your book")]
+        [StringLength(40,MinimumLength =5)]
         public string Title { get; set; }
-        [Required]
-        [StringLength(40)]
+        [Required(ErrorMessage = "Please enter Author name")]
+        [StringLength(40, MinimumLength=5)]
         public string Author { get; set; }
-        [Required]
-        [StringLength(40)]
+        [Required(ErrorMessage = "Please enter the Language of your book")]
+        [StringLength(40,MinimumLength =2)]
         public string Language { get; set; }
+
         public Category Category { get; set; }
         [ForeignKey("Category")]
         public int categoryID { get; set; }

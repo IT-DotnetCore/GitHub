@@ -12,7 +12,7 @@ using TestLibrary.Models;
 
 namespace TestLibrary.Controllers
 {
-    [Authorize("Admin,Executive")]
+   // [Authorize("Admin,Executive")]
     public class BooksController : Controller
     {
         private readonly LibraryDbContext _context;
@@ -87,6 +87,7 @@ namespace TestLibrary.Controllers
 
         public IActionResult Create()
         {
+            ViewBag.Language = Language.items;
             ViewData["categoryID"] = new SelectList(_context.categories, "id", "Name");
             return View();
         }

@@ -11,7 +11,7 @@ using TestLibrary.Models;
 
 namespace TestLibrary.Controllers
 {
-    [Authorize("Admin,Executive")]
+   // [Authorize("Admin,Executive")]
     public class CategoriesController : Controller
     {
         private readonly LibraryDbContext _context;

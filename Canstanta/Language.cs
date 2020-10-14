@@ -9,8 +9,7 @@ namespace TestLibrary.Canstanta
 {
     public class Language
     {
-        private List<string> items = new List<string>();
-       
+        public static List<string> items = new List<string>() { "English","Uzbek","Russia","Japan"};
      
            
     }
